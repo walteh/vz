@@ -353,9 +353,10 @@ void setIsConsoleVZVirtioConsolePortConfiguration(void *consolePortConfig, bool 
 }
 
 /*!
- @abstract Set the console port attachment. Defines how the virtual machine's console port interfaces with the host system. Default is nil.
- @see VZFileHandleSerialPortAttachment
- @see VZFileSerialPortAttachment
+ @abstract Set the attachment on the Virtio Console Port Configuration.
+ @param consolePortConfig The VZVirtioConsolePortConfiguration instance.
+ @param serialPortAttachment The VZSerialPortAttachment instance.
+
  @see VZSpiceAgentPortAttachment
  */
 void setAttachmentVZVirtioConsolePortConfiguration(void *consolePortConfig, void *serialPortAttachment)
@@ -365,6 +366,35 @@ void setAttachmentVZVirtioConsolePortConfiguration(void *consolePortConfig, void
         [(VZVirtioConsolePortConfiguration *)consolePortConfig
             setAttachment:(VZSerialPortAttachment *)serialPortAttachment];
         return;
+    }
+#endif
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+/*!
+ @abstract Get the attachment from a console port.
+ @param port The VZVirtioConsolePort instance.
+ @return The VZSerialPortAttachment instance or NULL if not set.
+ */
+void *VZVirtioConsolePort_getAttachment(void *port)
+{
+#ifdef INCLUDE_TARGET_OSX_13
+    if (@available(macOS 13, *)) {
+        return [(VZVirtioConsolePort *)port attachment];
+    }
+#endif
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+/*!
+ @abstract Set the console port attachment. Defines how the virtual machine's console port interfaces with the host system.
+ */
+void *VZVirtioConsolePort_setAttachment(void *port, void *attachment)
+{
+#ifdef INCLUDE_TARGET_OSX_13
+    if (@available(macOS 13, *)) {
+        [(VZVirtioConsolePort *)port setAttachment:(VZSerialPortAttachment *)attachment];
+        return NULL; // Return void* requires a return value, even if it's just NULL
     }
 #endif
     RAISE_UNSUPPORTED_MACOS_EXCEPTION();
@@ -623,31 +653,3 @@ const char *VZVirtioConsolePort_name(void *port)
 #endif
     RAISE_UNSUPPORTED_MACOS_EXCEPTION();
 }
-
-/*!
- @abstract Set the console port attachment. Defines how the virtual machine's console port interfaces with the host system.
- */
-void *VZVirtioConsolePort_setAttachment(void *port, void *attachment)
-{
-#ifdef INCLUDE_TARGET_OSX_13
-    if (@available(macOS 13, *)) {
-        [(VZVirtioConsolePort *)port setAttachment:(VZSerialPortAttachment *)attachment];
-        return NULL; // Return void* requires a return value, even if it's just NULL
-    }
-#endif
-    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
-}
-
-/*!
- @abstract Get the console port attachment.
- */
-void *VZVirtioConsolePort_getAttachment(void *port)
-{
-#ifdef INCLUDE_TARGET_OSX_13
-    if (@available(macOS 13, *)) {
-        return [(VZVirtioConsolePort *)port attachment]; // VZSerialPortAttachment
-    }
-#endif
-    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
-}
-

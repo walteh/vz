@@ -71,3 +71,6 @@ static inline vm_completion_handler_t makeVMCompletionHandler(uintptr_t cgoHandl
         virtualMachineCompletionHandler(cgoHandle, err);
     });
 }
+
+
+const char *getNSObjectClassName(void *object);

@@ -28,3 +28,8 @@ NSDictionary *dumpProcessinfo()
 #endif
     };
 }
+
+const char *getNSObjectClassName(void *object)
+{
+    return [[[(NSObject *)object class] description] UTF8String];
+}

@@ -140,7 +140,7 @@ unsigned long long VZVirtioTraditionalMemoryBalloonDevice_getTargetVirtualMachin
 
 /* VZFileSerialPortAttachment */
 // https://developer.apple.com/documentation/virtualization/vzfileserialportattachment
-const char *VZFileSerialPortAttachment_url(void *att); 
+const char *VZFileSerialPortAttachment_url(void *att);
 bool VZFileSerialPortAttachment_append(void *att);
 
 /* VZFileHandleSerialPortAttachment */

@@ -21,7 +21,8 @@ type SerialPortAttachment interface {
 	serialPortAttachment()
 }
 
-type baseSerialPortAttachment struct{}
+type baseSerialPortAttachment struct{
+}
 
 func (*baseSerialPortAttachment) serialPortAttachment() {}
 

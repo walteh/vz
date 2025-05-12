@@ -7,6 +7,7 @@ package vz
 */
 import "C"
 import (
+	"fmt"
 	"unsafe"
 
 	"github.com/Code-Hex/vz/v3/internal/objc"
@@ -271,7 +272,8 @@ func (p *VirtioConsolePort) Name() (string, error) {
 
 // Attachment returns the last observed (handled by get, set) serial port attachment associated with this console port.
 // It does not return the current attachment, but rather a cached value from the last call to [VirtioConsolePort.GetAttachment] or [VirtioConsolePort.SetAttachment].
-// For the current attachment, use [VirtioConsolePort.GetAttachment].
+// This returns the original Go SerialPortAttachment object that was set, not a wrapped Objective-C instance.
+// For the current attachment from the Objective-C runtime, use [VirtioConsolePort.GetAttachment].
 // Returns nil if no attachment is set.
 // This is only supported on macOS 13 and newer.
 func (p *VirtioConsolePort) Attachment() (SerialPortAttachment, error) {
@@ -294,19 +296,39 @@ func (p *VirtioConsolePort) GetAttachment() (SerialPortAttachment, error) {
 		return nil, nil
 	}
 
-	// Need to determine the type of attachment and wrap it.
-	// This requires checking the Objective-C class, which is complex via cgo.
-	// For now, we return a basic pointer. A more robust solution would involve
-	// Objective-C helper functions or more sophisticated bridging.
-	// Consider using dedicated attachment types if specific functionality is needed.
-	p.attachment = &FileHandleSerialPortAttachment{
-		pointer: objc.NewPointer(attachmentPtr),
-	} // Assuming FileHandle for simplicity; THIS IS LIKELY INCORRECT
-
-	// Alternative: Return an opaque pointer that can be cast later if needed.
-	// p.attachment = &baseSerialPortAttachment{ pointer: objc.NewPointer(attachmentPtr) }
-
-	return p.attachment, nil
+	// Get the class name using our helper function
+	classNamePtr := C.getNSObjectClassName(attachmentPtr)
+	if classNamePtr == nil {
+		return nil, fmt.Errorf("failed to get attachment class name")
+	}
+	
+	className := C.GoString(classNamePtr)
+	
+	var attachment SerialPortAttachment
+	
+	switch className {
+	case "VZSpiceAgentPortAttachment":
+		
+	case "VZFileHandleSerialPortAttachment":
+		attachment = &FileHandleSerialPortAttachment{
+			pointer: objc.NewPointer(attachmentPtr),
+		}
+	case "VZFileSerialPortAttachment":
+		attachment = &FileSerialPortAttachment{
+			pointer: objc.NewPointer(attachmentPtr),
+		}
+	default:
+		// For unknown types, log the class name but continue with a generic type
+		fmt.Printf("Warning: Unknown attachment class: %s\n", className)
+		attachment = &FileHandleSerialPortAttachment{
+			pointer: objc.NewPointer(attachmentPtr),
+		}
+	}
+	
+	// Update the cached attachment
+	p.attachment = attachment
+	
+	return attachment, nil
 }
 
 // SetAttachment sets the serial port attachment for this console port.
@@ -321,7 +343,12 @@ func (p *VirtioConsolePort) SetAttachment(attachment SerialPortAttachment) error
 	if attachment != nil {
 		attachmentPtr = objc.Ptr(attachment)
 	}
+	
+	// Set attachment in Objective-C
 	C.VZVirtioConsolePort_setAttachment(objc.Ptr(p), attachmentPtr)
-	p.attachment = attachment // Update cache
+	
+	// Store the original Go object as our cached value
+	p.attachment = attachment
+	
 	return nil
 }
