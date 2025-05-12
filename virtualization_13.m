@@ -511,7 +511,6 @@ void *VZVirtualMachine_consoleDevices(void *machine)
 }
 
 
-#ifdef INCLUDE_TARGET_OSX_13
 @implementation VZVirtioConsoleDeviceDelegateImpl {
     uintptr_t _cgoHandle;
     VZVirtioConsolePortCallback _didOpenCallback;
@@ -546,7 +545,6 @@ void *VZVirtualMachine_consoleDevices(void *machine)
 }
 
 @end
-#endif // INCLUDE_TARGET_OSX_13
 
 
 /*!
