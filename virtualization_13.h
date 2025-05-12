@@ -47,9 +47,12 @@ const char *getMacOSGuestAutomountTag();
 
 void setMaximumTransmissionUnitVZFileHandleNetworkDeviceAttachment(void *attachment, NSInteger mtu);
 
-
 /* VZVirtioConsoleDevice */
 void *VZVirtualMachine_consoleDevices(void *machine);
+
+ typedef void (*VZVirtioConsolePortCallback)(uintptr_t cgoHandle,
+                                            void *consoleDevice,
+                                            void *port);
 
 void *VZVirtioConsoleDevice_ports(void *consoleDevice);
 void VZVirtioConsoleDevice_setDelegate(void *consoleDevice,
@@ -57,14 +60,14 @@ void VZVirtioConsoleDevice_setDelegate(void *consoleDevice,
                                        VZVirtioConsolePortCallback didOpen,
                                        VZVirtioConsolePortCallback didClose);
 
- typedef void (*VZVirtioConsolePortCallback)(uintptr_t cgoHandle,
-                                            void *consoleDevice /* VZVirtioConsoleDevice* */,
-                                            void *port          /* VZVirtioConsolePort* */);
 
 @interface VZVirtioConsoleDeviceDelegateImpl : NSObject <VZVirtioConsoleDeviceDelegate>
 - (instancetype)initWithHandle:(uintptr_t)cgoHandle
             didOpenCallback:(VZVirtioConsolePortCallback)didOpen
            didCloseCallback:(VZVirtioConsolePortCallback)didClose;
+
+- (void)virtioConsoleDevice:(VZVirtioConsoleDevice *)consoleDevice didOpenPort:(VZVirtioConsolePort *)port API_AVAILABLE(macos(13.0));
+- (void)virtioConsoleDevice:(VZVirtioConsoleDevice *)consoleDevice didClosePort:(VZVirtioConsolePort *)port API_AVAILABLE(macos(13.0));
 @end
 
 /* VZVirtioConsolePortArray */

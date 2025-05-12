@@ -145,6 +145,8 @@ bool VZFileSerialPortAttachment_append(void *att);
 
 /* VZFileHandleSerialPortAttachment */
 // https://developer.apple.com/documentation/virtualization/vzfilehandleserialportattachment
-void *VZFileHandleSerialPortAttachment_initWithFileHandleForReadingFileHandleForWriting(void *att, void *readFileHandle, void *writeFileHandle);
 void *VZFileHandleSerialPortAttachment_fileHandleForReading(void *att); /* NSFileHandle* */
 void *VZFileHandleSerialPortAttachment_fileHandleForWriting(void *att); /* NSFileHandle* */
+
+// Helper to get file descriptor from NSFileHandle
+int NSFileHandle_fileDescriptor(void *fileHandlePtr);

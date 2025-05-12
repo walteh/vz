@@ -1099,3 +1099,64 @@ unsigned long long VZVirtioTraditionalMemoryBalloonDevice_getTargetVirtualMachin
 
     RAISE_UNSUPPORTED_MACOS_EXCEPTION();
 }
+
+/*!
+ @abstract The URL of the file associated with the attachment.
+ */
+const char *VZFileSerialPortAttachment_url(void *att)
+{
+    if (@available(macOS 11, *)) {
+        return [[[(VZFileSerialPortAttachment *)att URL] path] UTF8String];
+    }
+
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+/*!
+ @abstract Whether the file associated with the attachment is opened in append mode.
+ */
+bool VZFileSerialPortAttachment_append(void *att)
+{
+    if (@available(macOS 11, *)) {
+        return (bool)[(VZFileSerialPortAttachment *)att append];
+    }
+
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+/*!
+ @abstract The file handle used for reading.
+ */
+void *VZFileHandleSerialPortAttachment_fileHandleForReading(void *att)
+{
+    if (@available(macOS 11, *)) {
+        return [(VZFileHandleSerialPortAttachment *)att fileHandleForReading]; // NSFileHandle*
+    }
+
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+/*!
+ @abstract The file handle used for writing.
+ */
+void *VZFileHandleSerialPortAttachment_fileHandleForWriting(void *att)
+{
+    if (@available(macOS 11, *)) {
+        return [(VZFileHandleSerialPortAttachment *)att fileHandleForWriting]; // NSFileHandle*
+    }
+
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+// Helper to get file descriptor from NSFileHandle
+int NSFileHandle_fileDescriptor(void *fileHandlePtr)
+{
+    if (@available(macOS 11, *)) {
+        NSFileHandle *handle = (NSFileHandle *)fileHandlePtr;
+        if (handle) {
+            return [handle fileDescriptor];
+        }
+    }
+    // Return -1 if handle is nil or on unsupported OS versions
+    return -1;
+}

@@ -476,3 +476,166 @@ void setMaximumTransmissionUnitVZFileHandleNetworkDeviceAttachment(void *attachm
 #endif
     RAISE_UNSUPPORTED_MACOS_EXCEPTION();
 }
+
+/* VZVirtioConsoleDevice */
+
+/*!
+ @abstract Return the list of console devices configured on this virtual machine.
+ @discussion Returns an empty array if no console device is configured.
+ @see VZVirtioConsoleDeviceConfiguration
+ @see VZVirtualMachineConfiguration
+ */
+void *VZVirtualMachine_consoleDevices(void *machine)
+{
+#ifdef INCLUDE_TARGET_OSX_13
+    if (@available(macOS 13, *)) {
+        return [(VZVirtualMachine *)machine consoleDevices]; // NSArray<VZVirtioConsoleDevice *>
+    }
+#endif
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+
+#ifdef INCLUDE_TARGET_OSX_13
+@implementation VZVirtioConsoleDeviceDelegateImpl {
+    uintptr_t _cgoHandle;
+    VZVirtioConsolePortCallback _didOpenCallback;
+    VZVirtioConsolePortCallback _didCloseCallback;
+}
+
+- (instancetype)initWithHandle:(uintptr_t)cgoHandle
+            didOpenCallback:(VZVirtioConsolePortCallback)didOpen
+           didCloseCallback:(VZVirtioConsolePortCallback)didClose
+{
+    self = [super init];
+    if (self) {
+        _cgoHandle = cgoHandle;
+        _didOpenCallback = didOpen;
+        _didCloseCallback = didClose;
+    }
+    return self;
+}
+
+- (void)virtioConsoleDevice:(VZVirtioConsoleDevice *)consoleDevice didOpenPort:(VZVirtioConsolePort *)port
+{
+    if (_didOpenCallback) {
+        _didOpenCallback(_cgoHandle, consoleDevice, port);
+    }
+}
+
+- (void)virtioConsoleDevice:(VZVirtioConsoleDevice *)consoleDevice didClosePort:(VZVirtioConsolePort *)port
+{
+    if (_didCloseCallback) {
+        _didCloseCallback(_cgoHandle, consoleDevice, port);
+    }
+}
+
+@end
+#endif // INCLUDE_TARGET_OSX_13
+
+
+/*!
+ @abstract The console ports configured for this console device.
+ */
+void *VZVirtioConsoleDevice_ports(void *consoleDevice)
+{
+#ifdef INCLUDE_TARGET_OSX_13
+    if (@available(macOS 13, *)) {
+        return [(VZVirtioConsoleDevice *)consoleDevice ports]; // VZVirtioConsolePortArray
+    }
+#endif
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+/*!
+ @abstract Set the delegate for the console device.
+ */
+void VZVirtioConsoleDevice_setDelegate(void *consoleDevice,
+                                       uintptr_t cgoHandle,
+                                       VZVirtioConsolePortCallback didOpen,
+                                       VZVirtioConsolePortCallback didClose)
+{
+#ifdef INCLUDE_TARGET_OSX_13
+    if (@available(macOS 13, *)) {
+        VZVirtioConsoleDeviceDelegateImpl *delegate = [[VZVirtioConsoleDeviceDelegateImpl alloc] initWithHandle:cgoHandle
+                                                                                               didOpenCallback:didOpen
+                                                                                              didCloseCallback:didClose];
+        [(VZVirtioConsoleDevice *)consoleDevice setDelegate:[delegate autorelease]];
+        return;
+    }
+#endif
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+/* VZVirtioConsolePortArray */
+
+/*!
+ @abstract The maximum number of ports allocated by this device.
+ */
+size_t VZVirtioConsolePortArray_maximumPortCount(void *portArray)
+{
+#ifdef INCLUDE_TARGET_OSX_13
+    if (@available(macOS 13, *)) {
+        return [(VZVirtioConsolePortArray *)portArray maximumPortCount];
+    }
+#endif
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+/*!
+ @abstract Get a port at the specified index.
+ */
+void *VZVirtioConsolePortArray_objectAtIndexedSubscript(void *portArray, size_t index)
+{
+#ifdef INCLUDE_TARGET_OSX_13
+    if (@available(macOS 13, *)) {
+        return [(VZVirtioConsolePortArray *)portArray objectAtIndexedSubscript:index];
+    }
+#endif
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+
+/* VZVirtioConsolePort */
+
+/*!
+ @abstract The console port's name.
+ */
+const char *VZVirtioConsolePort_name(void *port)
+{
+#ifdef INCLUDE_TARGET_OSX_13
+    if (@available(macOS 13, *)) {
+        return [[(VZVirtioConsolePort *)port name] UTF8String];
+    }
+#endif
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+/*!
+ @abstract Set the console port attachment. Defines how the virtual machine's console port interfaces with the host system.
+ */
+void *VZVirtioConsolePort_setAttachment(void *port, void *attachment)
+{
+#ifdef INCLUDE_TARGET_OSX_13
+    if (@available(macOS 13, *)) {
+        [(VZVirtioConsolePort *)port setAttachment:(VZSerialPortAttachment *)attachment];
+        return NULL; // Return void* requires a return value, even if it's just NULL
+    }
+#endif
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+/*!
+ @abstract Get the console port attachment.
+ */
+void *VZVirtioConsolePort_getAttachment(void *port)
+{
+#ifdef INCLUDE_TARGET_OSX_13
+    if (@available(macOS 13, *)) {
+        return [(VZVirtioConsolePort *)port attachment]; // VZSerialPortAttachment
+    }
+#endif
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+// END BELOW HERE
