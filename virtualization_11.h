@@ -137,3 +137,14 @@ VZVirtioSocketConnectionFlat convertVZVirtioSocketConnection2Flat(void *connecti
 /* VZVirtioTraditionalMemoryBalloonDevice */
 void VZVirtioTraditionalMemoryBalloonDevice_setTargetVirtualMachineMemorySize(void *balloonDevice, void *queue, unsigned long long targetMemorySize);
 unsigned long long VZVirtioTraditionalMemoryBalloonDevice_getTargetVirtualMachineMemorySize(void *balloonDevice, void *queue);
+
+/* VZFileSerialPortAttachment */
+// https://developer.apple.com/documentation/virtualization/vzfileserialportattachment
+const char *VZFileSerialPortAttachment_url(void *att); 
+bool VZFileSerialPortAttachment_append(void *att);
+
+/* VZFileHandleSerialPortAttachment */
+// https://developer.apple.com/documentation/virtualization/vzfilehandleserialportattachment
+void *VZFileHandleSerialPortAttachment_initWithFileHandleForReadingFileHandleForWriting(void *att, void *readFileHandle, void *writeFileHandle);
+void *VZFileHandleSerialPortAttachment_fileHandleForReading(void *att); /* NSFileHandle* */
+void *VZFileHandleSerialPortAttachment_fileHandleForWriting(void *att); /* NSFileHandle* */
