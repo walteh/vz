@@ -39,6 +39,7 @@ void setIsConsoleVZVirtioConsolePortConfiguration(void *consolePortConfig, bool 
 void setAttachmentVZVirtioConsolePortConfiguration(void *consolePortConfig, void *serialPortAttachment);
 void *newVZSpiceAgentPortAttachment();
 void setSharesClipboardVZSpiceAgentPortAttachment(void *attachment, bool sharesClipboard);
+bool getSharesClipboardVZSpiceAgentPortAttachment(void *attachment);
 const char *getSpiceAgentPortName();
 
 void startWithOptionsCompletionHandler(void *machine, void *queue, void *options, uintptr_t cgoHandle);
@@ -78,4 +79,3 @@ void *VZVirtioConsolePortArray_objectAtIndexedSubscript(void *portArray, size_t 
 const char *VZVirtioConsolePort_name(void *port);
 void *VZVirtioConsolePort_setAttachment(void *port, void *attachment);    
 void *VZVirtioConsolePort_getAttachment(void *port);
-

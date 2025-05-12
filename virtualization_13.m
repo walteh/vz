@@ -381,6 +381,21 @@ void *newVZSpiceAgentPortAttachment()
 }
 
 /*!
+ @abstract Get whether clipboard sharing is enabled for the Spice agent.
+ @param attachment The VZSpiceAgentPortAttachment instance.
+ @return Boolean indicating if clipboard sharing is enabled.
+ */
+bool getSharesClipboardVZSpiceAgentPortAttachment(void *attachment)
+{
+#ifdef INCLUDE_TARGET_OSX_13
+    if (@available(macOS 13, *)) {
+        return (bool)[(VZSpiceAgentPortAttachment *)attachment sharesClipboard];
+    }
+#endif
+    RAISE_UNSUPPORTED_MACOS_EXCEPTION();
+}
+
+/*!
  @abstract Enable the Spice agent clipboard sharing capability.
  @discussion
     If enabled, the clipboard capability will be advertised to the Spice guest agent. Copy and paste events
@@ -638,4 +653,3 @@ void *VZVirtioConsolePort_getAttachment(void *port)
     RAISE_UNSUPPORTED_MACOS_EXCEPTION();
 }
 
-// END BELOW HERE

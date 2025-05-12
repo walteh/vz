@@ -63,6 +63,22 @@ func NewFileHandleSerialPortAttachment(read, write *os.File) (*FileHandleSerialP
 	return attachment, nil
 }
 
+// FileDescriptorForReading returns the file descriptor used for reading.
+// Returns -1 if the file handle is nil or on unsupported OS versions.
+// see: https://developer.apple.com/documentation/virtualization/vzfilehandleserialportattachment/filehandleforreading?language=objc
+func (a *FileHandleSerialPortAttachment) FileDescriptorForReading() int {
+	ret := C.VZFileHandleSerialPortAttachment_fileHandleForReading(objc.Ptr(a))
+	return int(C.NSFileHandle_fileDescriptor(ret))
+}
+
+// FileDescriptorForWriting returns the file descriptor used for writing.
+// Returns -1 if the file handle is nil or on unsupported OS versions.
+// see: https://developer.apple.com/documentation/virtualization/vzfilehandleserialportattachment/filehandleforwriting?language=objc
+func (a *FileHandleSerialPortAttachment) FileDescriptorForWriting() int {
+	ret := C.VZFileHandleSerialPortAttachment_fileHandleForWriting(objc.Ptr(a))
+	return int(C.NSFileHandle_fileDescriptor(ret))
+}
+
 var _ SerialPortAttachment = (*FileSerialPortAttachment)(nil)
 
 // FileSerialPortAttachment defines a serial port attachment from a file.
@@ -110,6 +126,18 @@ func NewFileSerialPortAttachment(path string, shouldAppend bool) (*FileSerialPor
 		objc.Release(self)
 	})
 	return attachment, nil
+}
+
+// URL returns the file path associated with the attachment.
+// see: https://developer.apple.com/documentation/virtualization/vzfileserialportattachment/url?language=objc
+func (a *FileSerialPortAttachment) URL() string {
+	return C.GoString(C.VZFileSerialPortAttachment_url(objc.Ptr(a)))
+}
+
+// Append returns true if the file associated with the attachment is opened in append mode.
+// see: https://developer.apple.com/documentation/virtualization/vzfileserialportattachment/append?language=objc
+func (a *FileSerialPortAttachment) Append() bool {
+	return bool(C.VZFileSerialPortAttachment_append(objc.Ptr(a)))
 }
 
 // VirtioConsoleDeviceSerialPortConfiguration represents Virtio Console Serial Port Device.

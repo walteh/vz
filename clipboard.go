@@ -18,8 +18,6 @@ type SpiceAgentPortAttachment struct {
 	*pointer
 
 	*baseSerialPortAttachment
-
-	enabledSharesClipboard bool
 }
 
 var _ SerialPortAttachment = (*SpiceAgentPortAttachment)(nil)
@@ -36,7 +34,6 @@ func NewSpiceAgentPortAttachment() (*SpiceAgentPortAttachment, error) {
 		pointer: objc.NewPointer(
 			C.newVZSpiceAgentPortAttachment(),
 		),
-		enabledSharesClipboard: true,
 	}
 	objc.SetFinalizer(spiceAgent, func(self *SpiceAgentPortAttachment) {
 		objc.Release(self)
@@ -50,13 +47,18 @@ func (s *SpiceAgentPortAttachment) SetSharesClipboard(enable bool) {
 		objc.Ptr(s),
 		C.bool(enable),
 	)
-	s.enabledSharesClipboard = enable
 }
 
-// SharesClipboard returns enable the Spice agent clipboard sharing capability.
-func (s *SpiceAgentPortAttachment) SharesClipboard() bool { return s.enabledSharesClipboard }
+// SharesClipboard returns whether clipboard sharing is enabled for the Spice agent.
+func (a *SpiceAgentPortAttachment) SharesClipboard() (bool, error) {
+	if err := macOSAvailable(13); err != nil {
+		return false, err
+	}
+	return bool(C.getSharesClipboardVZSpiceAgentPortAttachment(objc.Ptr(a))), nil
+}
 
 // SpiceAgentPortAttachmentName returns the Spice agent port name.
+// It is always the same value.
 func SpiceAgentPortAttachmentName() (string, error) {
 	if err := macOSAvailable(13); err != nil {
 		return "", err
